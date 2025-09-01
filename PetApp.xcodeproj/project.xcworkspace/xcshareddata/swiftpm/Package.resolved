@@ -1,0 +1,15 @@
+{
+  "originHash" : "41bbca40ee00895dafc194b7c22683c8881ed277162e62027c856d525e45914e",
+  "pins" : [
+    {
+      "identity" : "swiftui-flow-grids",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/zijievv/swiftui-flow-grids",
+      "state" : {
+        "revision" : "24e382c6783078d28a5907a0e767674d8f19ef19",
+        "version" : "0.1.0"
+      }
+    }
+  ],
+  "version" : 3
+}
