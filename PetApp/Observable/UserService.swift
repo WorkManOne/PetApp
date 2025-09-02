@@ -45,18 +45,45 @@ class UserService: ObservableObject {
     }
 
     init() {
+        let health = CategoryModel(name: "Health")
+        let grooming = CategoryModel(name: "Grooming")
+        let hygiene = CategoryModel(name: "Hygiene")
+        let defaultCategories = [health, hygiene, grooming, CategoryModel(name: "Other")]
+        let defaultProcedures = [
+            ProcedureModel(name: "Vaccines", category: health, interval: 1, intervalType: .year, procedureTime: .morning),
+            ProcedureModel(name: "Deworming", category: health, interval: 2, intervalType: .month, procedureTime: .day),
+            ProcedureModel(name: "Fleas/ticks", category: health, interval: 2, intervalType: .day, procedureTime: .day),
+            ProcedureModel(name: "Claws", category: grooming, interval: 2, intervalType: .month, procedureTime: .evening),
+            ProcedureModel(name: "Trimming/clipping", category: grooming, interval: 1, intervalType: .year, procedureTime: .morning),
+            ProcedureModel(name: "Ears", category: hygiene, interval: 1, intervalType: .year, procedureTime: .morning),
+            ProcedureModel(name: "Teeth", category: hygiene, interval: 1, intervalType: .year, procedureTime: .morning),
+            ProcedureModel(name: "Bathing", category: hygiene, interval: 1, intervalType: .year, procedureTime: .morning),
+            ProcedureModel(name: "Combing", category: grooming, interval: 3, intervalType: .month, procedureTime: .evening)
+        ]
+        let petId = UUID()
+        var imageData = Data()
+        if let image = UIImage(named: "jack_pet_image"),
+           let data = image.jpegData(compressionQuality: 0.8) {
+            imageData = data
+        }
+        let defaultPets = [PetModel(id: petId, name: "Jack", age: 3, ageType: .year, imageData: imageData)]
+        let defaultEvents = [
+            EventModel(procedure: defaultProcedures[1], petId: petId, date: .now, isNotificationEnabled: false, timeRepeat: .week, procedureTime: .day),
+            EventModel(procedure: defaultProcedures[0], petId: petId, date: .now, isNotificationEnabled: false, timeRepeat: .year, procedureTime: .morning)
+        ]
+
         let userDefaults = UserDefaults.standard
         if let data = userDefaults.data(forKey: "pets"),
            let decoded = try? JSONDecoder().decode([PetModel].self, from: data) {
             pets = decoded
         } else {
-            pets = []
+            pets = defaultPets
         }
         if let data = userDefaults.data(forKey: "events"),
            let decoded = try? JSONDecoder().decode([EventModel].self, from: data) {
             events = decoded
         } else {
-            events = []
+            events = defaultEvents
         }
         if let data = userDefaults.data(forKey: "history"),
            let decoded = try? JSONDecoder().decode([EventStoryModel].self, from: data) {
@@ -64,25 +91,12 @@ class UserService: ObservableObject {
         } else {
             history = []
         }
-        let health = CategoryModel(name: "Health")
-        let grooming = CategoryModel(name: "Grooming")
-        let hygiene = CategoryModel(name: "Hygiene")
-        let defaultCategories = [health, hygiene, grooming, CategoryModel(name: "Other")]
+
         if let data = userDefaults.data(forKey: "procedures"),
            let decoded = try? JSONDecoder().decode([ProcedureModel].self, from: data) {
             procedures = decoded
         } else {
-            procedures = [
-                ProcedureModel(name: "Vaccines", category: health, interval: 1, intervalType: .year, procedureTime: .morning),
-                ProcedureModel(name: "Deworming", category: health, interval: 2, intervalType: .month, procedureTime: .day),
-                ProcedureModel(name: "Fleas/ticks", category: health, interval: 2, intervalType: .day, procedureTime: .day),
-                ProcedureModel(name: "Claws", category: grooming, interval: 2, intervalType: .month, procedureTime: .evening),
-                ProcedureModel(name: "Trimming/clipping", category: grooming, interval: 1, intervalType: .year, procedureTime: .morning),
-                ProcedureModel(name: "Ears", category: hygiene, interval: 1, intervalType: .year, procedureTime: .morning),
-                ProcedureModel(name: "Teeth", category: hygiene, interval: 1, intervalType: .year, procedureTime: .morning),
-                ProcedureModel(name: "Bathing", category: hygiene, interval: 1, intervalType: .year, procedureTime: .morning),
-                ProcedureModel(name: "Combing", category: grooming, interval: 3, intervalType: .month, procedureTime: .evening)
-            ]
+            procedures = defaultProcedures
         }
         if let data = userDefaults.data(forKey: "categories"),
            let decoded = try? JSONDecoder().decode([CategoryModel].self, from: data) {
