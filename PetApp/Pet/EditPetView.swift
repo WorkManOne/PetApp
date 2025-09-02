@@ -14,6 +14,7 @@ struct EditPetView: View {
     @EnvironmentObject var userService: UserService
     @Environment(\.dismiss) var dismiss
 
+    @State private var isEmptyNameAlert = false
     @State private var showImagePicker = false
     @State private var pickerSource: UIImagePickerController.SourceType = .photoLibrary
     @State private var showSourceSheet = false
@@ -113,6 +114,10 @@ struct EditPetView: View {
                     }
                     .lightFramed()
                     Button {
+                        guard !pet.name.isEmpty else {
+                            isEmptyNameAlert = true
+                            return
+                        }
                         if isEditing {
                             if let index = userService.pets.firstIndex(where: { $0.id == pet.id }) {
                                 userService.pets[index] = pet
@@ -164,6 +169,11 @@ struct EditPetView: View {
                 nav.interactivePopGestureRecognizer?.isEnabled = true
                 nav.interactivePopGestureRecognizer?.delegate = nil
             }
+        }
+        .alert("Incorrect data", isPresented: $isEmptyNameAlert) {
+            Button("Ок", role: .cancel) { }
+        } message: {
+            Text("Pet should have name")
         }
     }
 }

@@ -63,7 +63,7 @@ struct HomeView: View {
                 .pickerStyle(.segmented)
                 .padding(.horizontal, 20)
                 ScrollView(.horizontal) {
-                    HStack {
+                    HStack (alignment: .top) {
                         NavigationLink {
                             EditPetView()
                         } label: {
@@ -79,29 +79,39 @@ struct HomeView: View {
                             .frame(width: 50, height: 50)
                         }
                         ForEach (userService.pets) { pet in
-                            Button {
-                                selectedAnimalId = selectedAnimalId == pet.id ? nil : pet.id
-                            } label: {
-                                ZStack {
-                                    Color.grayFrame
-                                    if let data = pet.imageData, let image = UIImage(data: data) {
-                                        Image(uiImage: image)
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fill)
-                                            .clipShape(Circle())
+                            VStack {
+                                Button {
+                                    selectedAnimalId = selectedAnimalId == pet.id ? nil : pet.id
+                                } label: {
+                                    ZStack {
+                                        Color.grayFrame
+                                        if let data = pet.imageData, let image = UIImage(data: data) {
+                                            Image(uiImage: image)
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fill)
+                                                .clipShape(Circle())
+                                        }
+                                        Circle()
+                                            .stroke(.blueMain, lineWidth: selectedAnimalId == pet.id ? 5 : 0)
                                     }
-                                    Circle()
-                                        .stroke(.blueMain, lineWidth: selectedAnimalId == pet.id ? 5 : 0)
+                                    .clipShape(Circle())
+                                    .frame(width: 50, height: 50)
                                 }
-                                .clipShape(Circle())
-                                .frame(width: 50, height: 50)
-                            }
-                            .contextMenu {
-                                NavigationLink("Details") {
+                                NavigationLink {
                                     DetailPetView(petId: pet.id)
+                                } label: {
+                                    Text("Edit")
+                                        .foregroundStyle(.white)
+                                        .font(.system(size: 12))
+                                        .padding(.vertical, 5)
+                                        .padding(.horizontal, 10)
+                                        .background {
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .fill(.blueMain)
+                                        }
                                 }
                             }
-                            
+
                         }
                     }
                     .padding(.vertical, 20)

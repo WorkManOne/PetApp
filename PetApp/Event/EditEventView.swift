@@ -43,8 +43,8 @@ struct EditEventView: View {
 
     var body: some View {
         ZStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+            VStack (alignment: .leading) {
+                HStack (spacing: 5) {
                     Button {
                         dismiss()
                     } label: {
@@ -54,90 +54,119 @@ struct EditEventView: View {
                             .frame(width: 30, height: 30)
                             .foregroundStyle(.gray)
                     }
-                    Text("Setting up the procedure")
-                        .foregroundStyle(.blueMain)
-                        .font(.system(size: 41, weight: .semibold))
+                    Spacer()
                     Button {
                         withAnimation {
-                            isShowingProcedures = true
-                        }
-                    } label: {
-                        Text(event.procedure.name)
-                            .foregroundStyle(.textDark)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .lightFramed(isBordered: true)
-                    }
-                    Picker("", selection: $event.timeRepeat) {
-                        ForEach(IntervalType.allCases, id: \.self) { time in
-                            Text(time.rawValue)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    Picker("", selection: $event.procedureTime) {
-                        ForEach(ProcedureTime.allCases, id: \.self) { time in
-                            Text(time.rawValue)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .onChange(of: event.procedureTime) { newValue in
-                        event.date = event.date.setTimeBasedOn(procedureTime: newValue)
-                    }
-                    HStack {
-                        Text("Notifications")
-                            .foregroundStyle(.textDark)
-                            .font(.system(size: 19, weight: .medium))
-                        Toggle("", isOn: $event.isNotificationEnabled)
-                    }
-                    .lightFramed()
-                    Button {
-                        isShowingDatePicker = true
-                    } label: {
-                        HStack {
-                            Text("Next date")
-                                .foregroundStyle(.textDark)
-                                .font(.system(size: 19, weight: .medium))
-                            Spacer()
-                            Text(userService.dateFormatter(date: event.date))
-                                .foregroundStyle(.textDark)
-                                .font(.system(size: 15, weight: .light))
-                        }
-                        .lightFramed()
-                    }
-                    Button {
-                        event.date = Date()
-                    } label: {
-                        Text("MARK TODAY")
-                            .foregroundStyle(.white)
-                            .font(.system(size: 15, weight: .semibold))
-                            .blueFramed()
-                    }
-                    Rectangle()
-                        .fill(.grayFrame)
-                        .frame(height: 1)
-                    Text("Сompletion history")
-                        .foregroundStyle(.textDark)
-                        .font(.system(size: 24, weight: .semibold))
-                    let filteredEventStory = userService.history.filter { $0.eventId == event.id }
-                    ForEach (filteredEventStory) { story in
-                        HStack {
-                            VStack (alignment: .leading) {
-                                Text(story.procedure.name)
-                                    .foregroundStyle(.blueMain)
-                                    .font(.system(size: 19, weight: .semibold))
-                                Text(userService.dateFormatter(date: story.date))
-                                    .foregroundStyle(.gray)
-                                    .font(.system(size: 15, weight: .light))
+                            dismiss()
+                            DispatchQueue.main.asyncAfter(deadline: .now()+1) {
+                                withAnimation {
+                                    if let index = userService.events.firstIndex(of: event) {
+                                        userService.events.remove(at: index)
+                                    }
+                                }
                             }
-                            Spacer()
-                            Text(story.isCompleted ? "Completed" : "Overdue")
-                                .foregroundStyle(story.isCompleted ? .blueMain : .redMain)
-                                .font(.system(size: 15, weight: .semibold))
                         }
-                        .lightFramed()
+                    } label: {
+                        Image("trash")
+                            .resizable()
+                            .renderingMode(.template)
+                            .scaledToFit()
+                            .padding(5)
+                            .foregroundColor(.white)
                     }
+                    .background(.redMain)
+                    .clipShape(RoundedRectangle(cornerRadius: 5))
+                    .frame(width: 30, height: 30)
                 }
                 .padding(.horizontal, 20)
-                .padding(.bottom, getSafeAreaBottom() + 40)
+                Text("Setting up the procedure")
+                    .foregroundStyle(.blueMain)
+                    .font(.system(size: 41, weight: .semibold))
+                    .padding(.horizontal, 20)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        Button {
+                            withAnimation {
+                                isShowingProcedures = true
+                            }
+                        } label: {
+                            Text(event.procedure.name)
+                                .foregroundStyle(.textDark)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .lightFramed(isBordered: true)
+                        }
+                        Picker("", selection: $event.timeRepeat) {
+                            ForEach(IntervalType.allCases, id: \.self) { time in
+                                Text(time.rawValue)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        Picker("", selection: $event.procedureTime) {
+                            ForEach(ProcedureTime.allCases, id: \.self) { time in
+                                Text(time.rawValue)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .onChange(of: event.procedureTime) { newValue in
+                            event.date = event.date.setTimeBasedOn(procedureTime: newValue)
+                        }
+                        HStack {
+                            Text("Notifications")
+                                .foregroundStyle(.textDark)
+                                .font(.system(size: 19, weight: .medium))
+                            Toggle("", isOn: $event.isNotificationEnabled)
+                        }
+                        .lightFramed()
+                        Button {
+                            isShowingDatePicker = true
+                        } label: {
+                            HStack {
+                                Text("Next date")
+                                    .foregroundStyle(.textDark)
+                                    .font(.system(size: 19, weight: .medium))
+                                Spacer()
+                                Text(userService.dateFormatter(date: event.date))
+                                    .foregroundStyle(.textDark)
+                                    .font(.system(size: 15, weight: .light))
+                            }
+                            .lightFramed()
+                        }
+                        Button {
+                            event.date = Date()
+                        } label: {
+                            Text("MARK TODAY")
+                                .foregroundStyle(.white)
+                                .font(.system(size: 15, weight: .semibold))
+                                .blueFramed()
+                        }
+                        Rectangle()
+                            .fill(.grayFrame)
+                            .frame(height: 1)
+                        Text("Сompletion history")
+                            .foregroundStyle(.textDark)
+                            .font(.system(size: 24, weight: .semibold))
+                        let filteredEventStory = userService.history.filter { $0.eventId == event.id }
+                        ForEach (filteredEventStory) { story in
+                            HStack {
+                                VStack (alignment: .leading) {
+                                    Text(story.procedure.name)
+                                        .foregroundStyle(.blueMain)
+                                        .font(.system(size: 19, weight: .semibold))
+                                    Text(userService.dateFormatter(date: story.date))
+                                        .foregroundStyle(.gray)
+                                        .font(.system(size: 15, weight: .light))
+                                }
+                                Spacer()
+                                Text(story.isCompleted ? "Completed" : "Overdue")
+                                    .foregroundStyle(story.isCompleted ? .blueMain : .redMain)
+                                    .font(.system(size: 15, weight: .semibold))
+                            }
+                            .lightFramed()
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, getSafeAreaBottom() + 40)
+                }
             }
         }
         .background(.grayMain)
